@@ -2089,3 +2089,45 @@ document.addEventListener(
 
     }
 );
+
+// ======================================================
+// SERVICE WORKER
+// ======================================================
+
+if (
+    "serviceWorker" in navigator
+) {
+
+    window.addEventListener(
+        "load",
+        function() {
+
+            navigator.serviceWorker
+                .register(
+                    "./sw.js"
+                )
+                .then(
+                    function(registro) {
+
+                        console.log(
+                            "E.V. lista como aplicación",
+                            registro
+                        );
+
+                    }
+                )
+                .catch(
+                    function(error) {
+
+                        console.log(
+                            "Error al registrar Service Worker:",
+                            error
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+}
