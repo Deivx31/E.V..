@@ -1,11 +1,43 @@
 /* ==========================================
-   E.V. - DISEÑO
-   ========================================== */
+   E.V. - DISEÑO COMPLETO
+========================================== */
+
+:root {
+
+    --fondo: #08090d;
+    --fondo-2: #0e1017;
+
+    --tarjeta: #11131b;
+    --tarjeta-2: #171a24;
+
+    --borde: #252938;
+
+    --texto: #f4f5f8;
+    --texto-secundario: #8f95a3;
+
+    --acento: #9ca1ff;
+    --acento-fuerte: #777dff;
+
+    --verde: #69e6aa;
+
+}
+
 
 * {
+
     box-sizing: border-box;
+
     margin: 0;
+
     padding: 0;
+
+}
+
+
+html {
+
+    scroll-behavior: smooth;
+
 }
 
 
@@ -16,9 +48,14 @@ body {
         Helvetica,
         sans-serif;
 
-    background: #08090d;
+    background:
+        radial-gradient(
+            circle at 50% -20%,
+            #202445 0%,
+            #08090d 45%
+        );
 
-    color: #f5f5f5;
+    color: var(--texto);
 
     min-height: 100vh;
 
@@ -28,44 +65,76 @@ body {
 }
 
 
-button {
+button,
+input {
 
     font-family: inherit;
+
+}
+
+
+button {
 
     border: none;
 
     cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        opacity 0.2s ease;
+
+}
+
+
+button:active {
+
+    transform: scale(0.96);
 
 }
 
 
 /* ==========================================
    APP
-   ========================================== */
+========================================== */
 
 .app {
 
     width: 100%;
 
-    max-width: 600px;
+    max-width: 650px;
 
     margin: auto;
 
     padding:
         24px
         18px
-        100px;
+        120px;
 
 }
 
 
 /* ==========================================
-   ENCABEZADO
-   ========================================== */
+   HEADER
+========================================== */
 
 .header {
 
-    margin-bottom: 25px;
+    margin-bottom: 28px;
+
+    animation:
+        aparecer 0.5s ease;
+
+}
+
+
+.logo-area {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
 
 }
 
@@ -74,25 +143,69 @@ button {
 
     font-size: 42px;
 
-    font-weight: 800;
+    font-weight: 900;
 
-    letter-spacing: -2px;
+    letter-spacing: -3px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #9ca1ff
+        );
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+}
+
+
+.estado-online {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--texto-secundario);
+
+    font-size: 12px;
+
+}
+
+
+.estado-online span {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--verde);
+
+    box-shadow:
+        0 0 10px var(--verde);
 
 }
 
 
 .saludo {
 
-    font-size: 20px;
+    font-size: 22px;
 
-    margin-top: 4px;
+    font-weight: 600;
+
+    margin-top: 10px;
 
 }
 
 
 .fecha {
 
-    color: #90939c;
+    color: var(--texto-secundario);
 
     margin-top: 5px;
 
@@ -103,41 +216,80 @@ button {
 
 /* ==========================================
    TARJETAS
-   ========================================== */
+========================================== */
 
 .card {
+
+    position: relative;
+
+    overflow: hidden;
 
     background:
         linear-gradient(
             145deg,
-            #171922,
-            #101116
+            #181b26,
+            #101218
         );
 
     border:
-        1px solid #252833;
+        1px solid var(--borde);
 
-    border-radius: 24px;
+    border-radius: 26px;
+
+    box-shadow:
+        0 15px 45px
+        rgba(0, 0, 0, 0.25);
 
 }
 
 
 .principal {
 
-    padding: 25px;
+    padding: 26px;
 
-    margin-bottom: 30px;
+    margin-bottom: 32px;
+
+    animation:
+        subir 0.55s ease;
+
+}
+
+
+.principal-glow {
+
+    position: absolute;
+
+    width: 250px;
+
+    height: 250px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(120, 126, 255, 0.15),
+            transparent 70%
+        );
+
+    top: -150px;
+
+    right: -100px;
+
+    pointer-events: none;
 
 }
 
 
 .estado {
 
-    font-size: 12px;
+    position: relative;
+
+    font-size: 11px;
 
     letter-spacing: 2px;
 
-    color: #9ca1ff;
+    color: var(--acento);
 
     font-weight: bold;
 
@@ -146,9 +298,11 @@ button {
 
 .clase-numero {
 
-    margin-top: 12px;
+    position: relative;
 
-    color: #777b87;
+    margin-top: 14px;
+
+    color: #777d89;
 
     font-size: 13px;
 
@@ -157,46 +311,52 @@ button {
 
 .clase-numero span {
 
-    color: #aaaeb8;
+    color: #c4c7d0;
 
 }
 
 
 .principal h1 {
 
-    font-size: 30px;
+    position: relative;
+
+    font-size: 31px;
 
     margin-top: 8px;
 
-    line-height: 1.15;
+    line-height: 1.1;
 
 }
 
 
 .hora {
 
-    margin-top: 8px;
+    position: relative;
 
-    color: #aeb2bc;
+    margin-top: 9px;
 
-    font-size: 16px;
+    color: #b1b6c2;
+
+    font-size: 15px;
 
 }
 
 
 .barra {
 
+    position: relative;
+
     width: 100%;
 
-    height: 5px;
+    height: 6px;
 
-    background: #272a34;
+    background: #252936;
 
     border-radius: 10px;
 
     overflow: hidden;
 
-    margin-top: 22px;
+    margin-top: 24px;
 
 }
 
@@ -207,19 +367,28 @@ button {
 
     width: 0%;
 
-    background: #9ca1ff;
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #777dff,
+            #b2b6ff
+        );
 
     transition:
-        width 0.3s ease;
+        width 0.5s ease;
 
 }
 
 
 .siguiente {
 
-    margin-top: 14px;
+    position: relative;
 
-    color: #8e929d;
+    margin-top: 15px;
+
+    color: #9297a3;
 
     font-size: 13px;
 
@@ -228,11 +397,14 @@ button {
 
 /* ==========================================
    SECCIONES
-   ========================================== */
+========================================== */
 
 .seccion {
 
-    margin-top: 28px;
+    margin-top: 30px;
+
+    animation:
+        aparecer 0.5s ease;
 
 }
 
@@ -245,7 +417,9 @@ button {
 
     justify-content: space-between;
 
-    margin-bottom: 12px;
+    gap: 10px;
+
+    margin-bottom: 13px;
 
 }
 
@@ -261,7 +435,7 @@ button {
 
     background: transparent;
 
-    color: #9ca1ff;
+    color: var(--acento);
 
     font-size: 13px;
 
@@ -270,7 +444,7 @@ button {
 
 /* ==========================================
    LISTAS
-   ========================================== */
+========================================== */
 
 .lista {
 
@@ -278,7 +452,7 @@ button {
 
     flex-direction: column;
 
-    gap: 8px;
+    gap: 9px;
 
 }
 
@@ -287,18 +461,22 @@ button {
 
     display: flex;
 
-    gap: 15px;
+    gap: 14px;
 
     align-items: center;
 
     padding: 15px;
 
-    background: #12141a;
+    background:
+        rgba(18, 20, 27, 0.9);
 
     border:
-        1px solid #20232c;
+        1px solid #222633;
 
-    border-radius: 16px;
+    border-radius: 17px;
+
+    animation:
+        aparecer 0.25s ease;
 
 }
 
@@ -307,9 +485,11 @@ button {
 
     min-width: 82px;
 
-    color: #9ca1ff;
+    color: var(--acento);
 
     font-size: 13px;
+
+    font-weight: 600;
 
 }
 
@@ -325,9 +505,9 @@ button {
 
 .clase-horario {
 
-    margin-top: 4px;
+    margin-top: 5px;
 
-    color: #777b86;
+    color: #777d89;
 
     font-size: 12px;
 
@@ -336,18 +516,37 @@ button {
 
 /* ==========================================
    TAREAS
-   ========================================== */
+========================================== */
 
 .tarea {
 
-    background: #12141a;
+    background:
+        linear-gradient(
+            145deg,
+            #151821,
+            #101217
+        );
 
     border:
-        1px solid #20232c;
+        1px solid #232734;
 
-    border-radius: 16px;
+    border-radius: 18px;
 
-    padding: 15px;
+    padding: 16px;
+
+    animation:
+        aparecer 0.3s ease;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+
+}
+
+
+.tarea-completada {
+
+    opacity: 0.55;
 
 }
 
@@ -360,18 +559,18 @@ button {
 
     justify-content: space-between;
 
-    gap: 10px;
+    gap: 12px;
 
 }
 
 
 .tarea-materia {
 
-    color: #9ca1ff;
+    color: var(--acento);
 
     font-size: 12px;
 
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 
 }
 
@@ -382,6 +581,8 @@ button {
 
     font-weight: 600;
 
+    line-height: 1.35;
+
 }
 
 
@@ -391,58 +592,51 @@ button {
 
     font-size: 12px;
 
-    color: #8c909b;
-
-}
-
-
-.tarea-fecha.urgente {
-
-    color: #ff8f8f;
-
-}
-
-
-.tarea-fecha.sin-fecha {
-
-    color: #777b86;
+    color: #9298a5;
 
 }
 
 
 .completar {
 
-    width: 34px;
+    min-width: 38px;
 
-    height: 34px;
+    width: 38px;
+
+    height: 38px;
 
     border-radius: 50%;
 
-    background: #20232c;
+    background: #222735;
 
-    color: #aeb2bc;
+    border:
+        1px solid #303647;
 
-    font-size: 16px;
+    color: #d5d7df;
+
+    font-size: 18px;
 
 }
 
 
-.completar:active {
+.tarea-completada .completar {
 
-    transform: scale(0.92);
+    background: var(--verde);
+
+    color: #07120c;
 
 }
 
 
 /* ==========================================
    CONTADOR
-   ========================================== */
+========================================== */
 
 .contador {
 
-    min-width: 25px;
+    min-width: 27px;
 
-    height: 25px;
+    height: 27px;
 
     display: flex;
 
@@ -452,55 +646,394 @@ button {
 
     border-radius: 50%;
 
-    background: #20232c;
+    background: #202532;
 
-    color: #aaa;
+    color: var(--acento);
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+}
+
+
+/* ==========================================
+   BOTON AGREGAR
+========================================== */
+
+.boton-agregar {
+
+    width: 100%;
+
+    margin-top: 11px;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1c2030,
+            #161923
+        );
+
+    color: var(--acento);
+
+    border:
+        1px solid #2c3142;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+/* ==========================================
+   ASISTENTE
+========================================== */
+
+.asistente-box {
+
+    padding: 22px;
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #161927,
+            #0e1017
+        );
+
+    border:
+        1px solid #292e40;
+
+    overflow: hidden;
+
+}
+
+
+.ev-status {
+
+    color: var(--verde);
 
     font-size: 12px;
 
 }
 
 
-/* ==========================================
-   BOTÓN AGREGAR
-   ========================================== */
+.ev-visual {
 
-.boton-agregar {
+    display: flex;
 
-    width: 100%;
+    justify-content: center;
 
-    margin-top: 10px;
+    margin-bottom: 22px;
+
+}
+
+
+.orbita-ev {
+
+    position: relative;
+
+    width: 110px;
+
+    height: 110px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.orbita-anillo {
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(156, 161, 255, 0.45);
+
+    animation:
+        girar 8s linear infinite;
+
+}
+
+
+.anillo-2 {
+
+    inset: 10px;
+
+    animation-direction:
+        reverse;
+
+    animation-duration:
+        5s;
+
+    border-style:
+        dashed;
+
+}
+
+
+.ev-nucleo {
+
+    width: 68px;
+
+    height: 68px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at 30% 30%,
+            #c5c8ff,
+            #777dff,
+            #33388f
+        );
+
+    color: white;
+
+    font-weight: bold;
+
+    box-shadow:
+        0 0 30px
+        rgba(119, 125, 255, 0.6);
+
+}
+
+
+.respuesta-ev {
+
+    min-height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: #d7d9e2;
+
+    line-height: 1.5;
+
+    font-size: 15px;
+
+    padding:
+        10px
+        5px
+        20px;
+
+}
+
+
+.entrada-ev {
+
+    display: flex;
+
+    gap: 8px;
+
+}
+
+
+.entrada-ev input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    background: #0d0f15;
+
+    border:
+        1px solid #292e3c;
+
+    border-radius: 13px;
 
     padding: 14px;
 
-    border-radius: 14px;
+    color: white;
 
-    background: #191c25;
-
-    color: #b4b8ff;
-
-    border:
-        1px solid #292d3a;
-
-    font-size: 14px;
+    outline: none;
 
 }
 
 
-.boton-agregar:active {
+.entrada-ev input:focus {
 
-    transform: scale(0.98);
+    border-color:
+        var(--acento);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(156, 161, 255, 0.08);
+
+}
+
+
+.boton-enviar {
+
+    padding:
+        0
+        15px;
+
+    border-radius: 13px;
+
+    background: #252a3a;
+
+    color: var(--acento);
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+}
+
+
+.controles-voz {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    margin-top: 24px;
+
+}
+
+
+.boton-voz {
+
+    position: relative;
+
+    width: 74px;
+
+    height: 74px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #9499ff,
+            #5f66d8
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow:
+        0 0 30px
+        rgba(119, 125, 255, 0.4);
+
+    overflow: visible;
+
+}
+
+
+.icono-mic {
+
+    position: relative;
+
+    z-index: 2;
+
+    font-weight: bold;
+
+}
+
+
+.ondas {
+
+    position: absolute;
+
+    inset: -7px;
+
+    border:
+        1px solid
+        rgba(156, 161, 255, 0.5);
+
+    border-radius: 50%;
+
+    opacity: 0;
+
+}
+
+
+.boton-voz.escuchando {
+
+    animation:
+        pulso 1.2s infinite;
+
+}
+
+
+.boton-voz.escuchando .ondas {
+
+    animation:
+        onda 1.5s infinite;
+
+}
+
+
+.boton-voz.escuchando .onda-2 {
+
+    animation-delay:
+        0.5s;
+
+}
+
+
+.boton-voz.escuchando .onda-3 {
+
+    animation-delay:
+        1s;
+
+}
+
+
+.estado-voz {
+
+    margin-top: 12px;
+
+    font-size: 12px;
+
+    color: var(--texto-secundario);
 
 }
 
 
 /* ==========================================
-   NAVEGACIÓN
-   ========================================== */
+   NAVEGACION
+========================================== */
 
 .nav {
 
     position: fixed;
+
+    z-index: 50;
 
     left: 50%;
 
@@ -512,7 +1045,7 @@ button {
     width:
         calc(100% - 28px);
 
-    max-width: 570px;
+    max-width: 620px;
 
     display: grid;
 
@@ -523,12 +1056,20 @@ button {
 
     padding: 7px;
 
-    background: #111319;
+    background:
+        rgba(17, 19, 27, 0.94);
+
+    backdrop-filter:
+        blur(15px);
 
     border:
-        1px solid #282b35;
+        1px solid #292e3a;
 
-    border-radius: 18px;
+    border-radius: 20px;
+
+    box-shadow:
+        0 10px 40px
+        rgba(0, 0, 0, 0.4);
 
 }
 
@@ -537,36 +1078,29 @@ button {
 
     padding: 12px 5px;
 
-    border-radius: 13px;
+    border-radius: 14px;
 
     background: transparent;
 
-    color: #777b86;
+    color: #7f8592;
 
     font-size: 12px;
 
 }
 
 
-.nav button:active {
-
-    transform: scale(0.96);
-
-}
-
-
 .nav-activo {
 
-    background: #20232c !important;
+    background: #252a39 !important;
 
-    color: #e8e9ed !important;
+    color: #f0f1f5 !important;
 
 }
 
 
 /* ==========================================
    PANELES
-   ========================================== */
+========================================== */
 
 .panel {
 
@@ -574,15 +1108,20 @@ button {
 
     inset: 0;
 
-    z-index: 20;
+    z-index: 100;
 
-    background: #08090d;
+    background: var(--fondo);
 
     transform:
         translateY(100%);
 
     transition:
-        transform 0.22s ease;
+        transform 0.35s cubic-bezier(
+            .2,
+            .8,
+            .2,
+            1
+        );
 
     overflow-y: auto;
 
@@ -601,14 +1140,14 @@ button {
 
     width: 100%;
 
-    max-width: 600px;
+    max-width: 650px;
 
     margin: auto;
 
     padding:
-        24px
+        25px
         18px
-        50px;
+        60px;
 
 }
 
@@ -622,48 +1161,61 @@ button {
 
     align-items: center;
 
-    margin-bottom: 22px;
+    margin-bottom: 25px;
 
 }
 
 
 .panel-header h2 {
 
-    font-size: 25px;
+    font-size: 27px;
 
 }
 
 
 .panel-header button {
 
-    background: #181b22;
+    background: #1b1f2a;
 
-    color: #aaaeb8;
+    color: #b5bac6;
 
     padding:
-        9px
-        13px;
+        10px
+        14px;
 
-    border-radius: 10px;
+    border-radius: 12px;
+
+}
+
+
+.panel-subtitulo {
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    color: var(--acento);
+
+    margin-bottom: 6px;
 
 }
 
 
 /* ==========================================
-   DÍAS
-   ========================================== */
+   DIAS
+========================================== */
 
 .dias {
 
     display: flex;
 
-    gap: 6px;
+    gap: 7px;
 
     overflow-x: auto;
 
-    padding-bottom: 10px;
+    padding-bottom: 12px;
 
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 
 }
 
@@ -674,52 +1226,283 @@ button {
 
     padding:
         10px
-        13px;
+        14px;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
-    background: #15171e;
+    background: #151820;
 
-    color: #858995;
+    border:
+        1px solid #252a35;
+
+    color: #8d93a0;
 
 }
 
 
 .dias button.activo {
 
-    background: #292d3a;
+    background: #292f42;
 
-    color: #e5e6eb;
+    color: #e8e9ee;
+
+    border-color:
+        var(--acento);
 
 }
 
 
 /* ==========================================
-   E.V.
-   ========================================== */
+   FILTROS
+========================================== */
+
+.filtro-tareas {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.filtro {
+
+    flex: 1;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background: #161920;
+
+    color: #8c919d;
+
+    border:
+        1px solid #252936;
+
+}
+
+
+.filtro.activo {
+
+    background: #292f40;
+
+    color: var(--acento);
+
+    border-color:
+        #3b4260;
+
+}
+
+
+/* ==========================================
+   MODAL
+========================================== */
+
+.modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+
+    align-items: flex-end;
+
+}
+
+
+.modal.activo {
+
+    display: flex;
+
+}
+
+
+.modal-fondo {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(0, 0, 0, 0.65);
+
+    backdrop-filter:
+        blur(4px);
+
+}
+
+
+.modal-contenido {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 650px;
+
+    margin: auto;
+
+    background:
+        linear-gradient(
+            145deg,
+            #171a24,
+            #0f1117
+        );
+
+    border:
+        1px solid #292e3b;
+
+    border-radius:
+        28px
+        28px
+        0
+        0;
+
+    padding:
+        25px
+        20px
+        35px;
+
+    animation:
+        modalSubir 0.3s ease;
+
+}
+
+
+.modal-header {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items: center;
+
+    margin-bottom: 22px;
+
+}
+
+
+.modal-header h2 {
+
+    font-size: 24px;
+
+}
+
+
+.modal-header button {
+
+    background: #20242e;
+
+    color: #afb4bf;
+
+    padding:
+        9px
+        12px;
+
+    border-radius: 10px;
+
+}
+
+
+.modal-contenido label {
+
+    display: block;
+
+    margin:
+        16px
+        0
+        7px;
+
+    color: #a7acb7;
+
+    font-size: 13px;
+
+}
+
+
+.modal-contenido input {
+
+    width: 100%;
+
+    padding: 15px;
+
+    border-radius: 13px;
+
+    background: #0d0f14;
+
+    color: white;
+
+    border:
+        1px solid #292e3a;
+
+    outline: none;
+
+}
+
+
+.boton-guardar {
+
+    width: 100%;
+
+    margin-top: 22px;
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #777dff,
+            #9ca1ff
+        );
+
+    color: white;
+
+    font-weight: bold;
+
+}
+
+
+/* ==========================================
+   MENSAJE FLOTANTE
+========================================== */
 
 .ev-mensaje {
 
     position: fixed;
 
+    z-index: 300;
+
     left: 50%;
 
-    bottom: 90px;
+    bottom: 95px;
 
     transform:
-        translate(-50%, 20px);
+        translate(-50%, 30px);
 
     width:
         calc(100% - 36px);
 
-    max-width: 500px;
+    max-width: 520px;
 
     padding: 15px;
 
-    background: #171a22;
+    background:
+        rgba(23, 26, 34, 0.96);
+
+    backdrop-filter:
+        blur(14px);
 
     border:
-        1px solid #292d38;
+        1px solid #303544;
 
     border-radius: 18px;
 
@@ -734,10 +1517,8 @@ button {
     pointer-events: none;
 
     transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-
-    z-index: 30;
+        opacity 0.25s ease,
+        transform 0.25s ease;
 
 }
 
@@ -754,9 +1535,11 @@ button {
 
 .ev-circulo {
 
-    min-width: 42px;
+    min-width: 43px;
 
-    height: 42px;
+    height: 43px;
+
+    border-radius: 50%;
 
     display: flex;
 
@@ -764,11 +1547,9 @@ button {
 
     justify-content: center;
 
-    border-radius: 50%;
+    background: #30364d;
 
-    background: #292d3a;
-
-    color: #b7bbff;
+    color: var(--acento);
 
     font-weight: bold;
 
@@ -779,29 +1560,171 @@ button {
 
 .ev-texto {
 
-    font-size: 14px;
+    font-size: 13px;
 
     line-height: 1.4;
 
-    color: #d5d7dd;
+    color: #d7d9e0;
+
+}
+
+
+/* ==========================================
+   ANIMACIONES
+========================================== */
+
+@keyframes aparecer {
+
+    from {
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        opacity: 1;
+
+    }
+
+}
+
+
+@keyframes subir {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(15px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+@keyframes girar {
+
+    from {
+
+        transform:
+            rotate(0deg);
+
+    }
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+@keyframes pulso {
+
+    0% {
+
+        box-shadow:
+            0 0 0 0
+            rgba(119, 125, 255, 0.6);
+
+    }
+
+    70% {
+
+        box-shadow:
+            0 0 0 18px
+            rgba(119, 125, 255, 0);
+
+    }
+
+    100% {
+
+        box-shadow:
+            0 0 0 0
+            rgba(119, 125, 255, 0);
+
+    }
+
+}
+
+
+@keyframes onda {
+
+    0% {
+
+        transform:
+            scale(0.8);
+
+        opacity: 0;
+
+    }
+
+    40% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
+        transform:
+            scale(1.5);
+
+        opacity: 0;
+
+    }
+
+}
+
+
+@keyframes modalSubir {
+
+    from {
+
+        transform:
+            translateY(100px);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform:
+            translateY(0);
+
+        opacity: 1;
+
+    }
 
 }
 
 
 /* ==========================================
    CELULAR
-   ========================================== */
+========================================== */
 
-@media (
-    max-width: 450px
-) {
+@media (max-width: 450px) {
 
     .app {
 
         padding:
             20px
             14px
-            95px;
+            110px;
 
     }
 
@@ -813,17 +1736,54 @@ button {
     }
 
 
+    .saludo {
+
+        font-size: 19px;
+
+    }
+
+
+    .principal {
+
+        padding: 22px;
+
+    }
+
+
     .principal h1 {
 
-        font-size: 26px;
+        font-size: 27px;
 
     }
 
 
     .clase {
 
-        padding: 13px;
+        padding: 14px;
 
     }
 
-}
+
+    .clase-hora {
+
+        min-width: 72px;
+
+        font-size: 12px;
+
+    }
+
+
+    .entrada-ev {
+
+        flex-direction: column;
+
+    }
+
+
+    .boton-enviar {
+
+        padding: 14px;
+
+    }
+
+       }
