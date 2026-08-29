@@ -15,7 +15,48 @@
         content="#08090d"
     >
 
-    <title>E.V.</title>
+    <meta
+        name="description"
+        content="E.V. - Tu asistente escolar inteligente"
+    >
+
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="E.V."
+    >
+
+    <title>E.V. - Asistente Escolar</title>
+
+
+    <!-- PWA -->
+
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="icons/icon-192.png"
+    >
+
+
+    <!-- ESTILOS -->
 
     <link
         rel="stylesheet"
@@ -29,24 +70,17 @@
 
 <main class="app">
 
+
     <!-- ==============================
          ENCABEZADO
     =============================== -->
 
     <header class="header">
 
-        <div class="logo-area">
-
-            <div class="logo">
-                E.V.
-            </div>
-
-            <div class="estado-online">
-                <span></span>
-                En línea
-            </div>
-
+        <div class="logo">
+            E.V.
         </div>
+
 
         <div
             id="saludo"
@@ -54,6 +88,7 @@
         >
             Cargando...
         </div>
+
 
         <div
             id="fecha"
@@ -65,13 +100,12 @@
     </header>
 
 
+
     <!-- ==============================
          CLASE ACTUAL
     =============================== -->
 
     <section class="card principal">
-
-        <div class="principal-glow"></div>
 
         <div
             id="estadoClase"
@@ -80,16 +114,22 @@
             Cargando...
         </div>
 
+
         <div class="clase-numero">
 
             Clase
-            <span id="numeroClase">--</span>
+
+            <span id="numeroClase">
+                --
+            </span>
 
         </div>
+
 
         <h1 id="claseActual">
             Cargando...
         </h1>
+
 
         <div
             id="horaClase"
@@ -97,6 +137,7 @@
         >
             --
         </div>
+
 
         <div class="barra">
 
@@ -107,6 +148,7 @@
 
         </div>
 
+
         <div
             id="siguienteClase"
             class="siguiente"
@@ -115,6 +157,7 @@
         </div>
 
     </section>
+
 
 
     <!-- ==============================
@@ -129,6 +172,7 @@
                 Horario de hoy
             </h2>
 
+
             <button
                 type="button"
                 onclick="mostrarHorario()"
@@ -138,12 +182,14 @@
 
         </div>
 
+
         <div
             id="horarioHoy"
             class="lista"
         ></div>
 
     </section>
+
 
 
     <!-- ==============================
@@ -158,6 +204,7 @@
                 Tareas pendientes
             </h2>
 
+
             <span
                 id="contadorTareas"
                 class="contador"
@@ -167,20 +214,23 @@
 
         </div>
 
+
         <div
             id="tareas"
             class="lista"
         ></div>
+
 
         <button
             type="button"
             class="boton-agregar"
             onclick="nuevaTarea()"
         >
-            Agregar tarea
+            + Agregar tarea
         </button>
 
     </section>
+
 
 
     <!-- ==============================
@@ -188,8 +238,8 @@
     =============================== -->
 
     <section
-        id="seccionEV"
         class="seccion asistente"
+        id="seccionEV"
     >
 
         <div class="titulo-seccion">
@@ -198,90 +248,58 @@
                 Habla con E.V.
             </h2>
 
-            <span class="ev-status">
-                Asistente activa
-            </span>
-
         </div>
 
 
         <div class="asistente-box">
 
-            <div class="ev-visual">
 
-                <div
-                    id="orbitaEV"
-                    class="orbita-ev"
-                >
-
-                    <div class="orbita-anillo"></div>
-                    <div class="orbita-anillo anillo-2"></div>
-
-                    <div class="ev-nucleo">
-                        E.V.
-                    </div>
-
-                </div>
-
-            </div>
-
+            <!-- RESPUESTA -->
 
             <div
                 id="respuestaEV"
                 class="respuesta-ev"
             >
-                Hola David. Soy E.V. ¿Qué necesitas?
+                Hola David. Estoy lista para ayudarte.
             </div>
 
 
+
+            <!-- ENTRADA -->
+
             <div class="entrada-ev">
+
 
                 <input
                     id="entradaTexto"
                     type="text"
                     placeholder="Escribe o habla con E.V..."
                     autocomplete="off"
+                    enterkeyhint="send"
                 >
+
 
                 <button
                     type="button"
-                    id="botonEnviar"
                     class="boton-enviar"
                     onclick="procesarEntrada()"
-                    title="Enviar"
+                    title="Enviar mensaje"
                 >
                     Enviar
                 </button>
 
-            </div>
-
-
-            <div class="controles-voz">
 
                 <button
-                    type="button"
                     id="botonEscuchar"
-                    class="boton-voz"
+                    type="button"
+                    class="microfono"
                     onclick="escuchar()"
                     title="Hablar con E.V."
+                    aria-label="Hablar con E.V."
                 >
-
-                    <span class="ondas onda-1"></span>
-                    <span class="ondas onda-2"></span>
-                    <span class="ondas onda-3"></span>
-
-                    <span class="icono-mic">
-                        Mic
-                    </span>
-
+                    Mic
                 </button>
 
-                <div
-                    id="estadoVoz"
-                    class="estado-voz"
-                >
-                    Toca para hablar
-                </div>
 
             </div>
 
@@ -289,49 +307,53 @@
 
     </section>
 
+
+
+    <!-- ==============================
+         NAVEGACIÓN
+    =============================== -->
+
+    <nav class="nav">
+
+
+        <button
+            type="button"
+            onclick="irInicio()"
+            class="nav-activo"
+        >
+            Inicio
+        </button>
+
+
+        <button
+            type="button"
+            onclick="mostrarHorario()"
+        >
+            Horario
+        </button>
+
+
+        <button
+            type="button"
+            onclick="mostrarTareas()"
+        >
+            Tareas
+        </button>
+
+
+        <button
+            type="button"
+            onclick="activarEV()"
+        >
+            E.V.
+        </button>
+
+
+    </nav>
+
+
 </main>
 
-
-<!-- ==============================
-     NAVEGACIÓN
-=============================== -->
-
-<nav class="nav">
-
-    <button
-        type="button"
-        id="navInicio"
-        onclick="irInicio()"
-        class="nav-activo"
-    >
-        Inicio
-    </button>
-
-    <button
-        type="button"
-        id="navHorario"
-        onclick="mostrarHorario()"
-    >
-        Horario
-    </button>
-
-    <button
-        type="button"
-        id="navTareas"
-        onclick="mostrarTareas()"
-    >
-        Tareas
-    </button>
-
-    <button
-        type="button"
-        id="navEV"
-        onclick="activarEV()"
-    >
-        E.V.
-    </button>
-
-</nav>
 
 
 <!-- ==============================
@@ -341,23 +363,18 @@
 <div
     id="panelHorario"
     class="panel"
+    aria-hidden="true"
 >
 
     <div class="panel-contenido">
 
+
         <div class="panel-header">
 
-            <div>
+            <h2>
+                Mi horario
+            </h2>
 
-                <div class="panel-subtitulo">
-                    ORGANIZACIÓN
-                </div>
-
-                <h2>
-                    Mi horario
-                </h2>
-
-            </div>
 
             <button
                 type="button"
@@ -369,59 +386,68 @@
         </div>
 
 
+
+        <!-- DÍAS -->
+
         <div class="dias">
+
 
             <button
                 type="button"
-                data-dia="lunes"
-                onclick="cambiarDia('lunes')"
+                onclick="cambiarDia(0)"
             >
                 Lunes
             </button>
 
+
             <button
                 type="button"
-                data-dia="martes"
-                onclick="cambiarDia('martes')"
+                onclick="cambiarDia(1)"
             >
                 Martes
             </button>
 
+
             <button
                 type="button"
-                data-dia="miercoles"
-                onclick="cambiarDia('miercoles')"
+                onclick="cambiarDia(2)"
             >
                 Miércoles
             </button>
 
+
             <button
                 type="button"
-                data-dia="jueves"
-                onclick="cambiarDia('jueves')"
+                onclick="cambiarDia(3)"
             >
                 Jueves
             </button>
 
+
             <button
                 type="button"
-                data-dia="viernes"
-                onclick="cambiarDia('viernes')"
+                onclick="cambiarDia(4)"
             >
                 Viernes
             </button>
 
+
         </div>
 
+
+
+        <!-- HORARIO -->
 
         <div
             id="horarioCompleto"
             class="lista"
         ></div>
 
+
     </div>
 
 </div>
+
 
 
 <!-- ==============================
@@ -431,23 +457,18 @@
 <div
     id="panelTareas"
     class="panel"
+    aria-hidden="true"
 >
 
     <div class="panel-contenido">
 
+
         <div class="panel-header">
 
-            <div>
+            <h2>
+                Mis tareas
+            </h2>
 
-                <div class="panel-subtitulo">
-                    ORGANIZACIÓN
-                </div>
-
-                <h2>
-                    Mis tareas
-                </h2>
-
-            </div>
 
             <button
                 type="button"
@@ -459,28 +480,37 @@
         </div>
 
 
+
+        <!-- FILTROS -->
+
         <div class="filtro-tareas">
 
+
             <button
-                type="button"
                 id="filtroPendientes"
+                type="button"
                 class="filtro activo"
                 onclick="cambiarFiltroTareas('pendientes')"
             >
                 Pendientes
             </button>
 
+
             <button
-                type="button"
                 id="filtroCompletadas"
+                type="button"
                 class="filtro"
                 onclick="cambiarFiltroTareas('completadas')"
             >
                 Completadas
             </button>
 
+
         </div>
 
+
+
+        <!-- LISTA -->
 
         <div
             id="tareasCompletas"
@@ -488,123 +518,30 @@
         ></div>
 
 
+
+        <!-- AGREGAR -->
+
         <button
             type="button"
             class="boton-agregar"
             onclick="nuevaTarea()"
         >
-            Agregar tarea
+            + Agregar tarea
         </button>
+
 
     </div>
 
 </div>
+
 
 
 <!-- ==============================
-     MODAL NUEVA TAREA
+     SCRIPT PRINCIPAL
 =============================== -->
-
-<div
-    id="modalTarea"
-    class="modal"
->
-
-    <div class="modal-fondo"></div>
-
-    <div class="modal-contenido">
-
-        <div class="modal-header">
-
-            <div>
-
-                <div class="panel-subtitulo">
-                    NUEVA ACTIVIDAD
-                </div>
-
-                <h2>
-                    Agregar tarea
-                </h2>
-
-            </div>
-
-            <button
-                type="button"
-                onclick="cerrarModalTarea()"
-            >
-                Cerrar
-            </button>
-
-        </div>
-
-
-        <label>
-            Materia
-        </label>
-
-        <input
-            id="inputMateria"
-            type="text"
-            placeholder="Ejemplo: Matemáticas"
-        >
-
-
-        <label>
-            Tarea
-        </label>
-
-        <input
-            id="inputNombreTarea"
-            type="text"
-            placeholder="¿Qué tienes que hacer?"
-        >
-
-
-        <label>
-            Fecha y hora
-        </label>
-
-        <input
-            id="inputFechaTarea"
-            type="datetime-local"
-        >
-
-
-        <button
-            type="button"
-            class="boton-guardar"
-            onclick="guardarNuevaTarea()"
-        >
-            Guardar tarea
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- ==============================
-     MENSAJE FLOTANTE
-=============================== -->
-
-<div
-    id="evMensaje"
-    class="ev-mensaje"
->
-
-    <div class="ev-circulo">
-        E.V.
-    </div>
-
-    <div
-        id="evMensajeTexto"
-        class="ev-texto"
-    ></div>
-
-</div>
-
 
 <script src="app.js"></script>
+
 
 </body>
 
