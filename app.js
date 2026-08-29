@@ -1,6 +1,6 @@
 // ======================================================
 // E.V.
-// Asistente escolar de David
+// ASISTENTE ESCOLAR
 // ======================================================
 
 
@@ -25,7 +25,7 @@ const horario = {
         ["Rep. Carroceria", "01:50 PM", "02:40 PM"],
         ["Rep. Carroceria", "02:40 PM", "03:30 PM"],
         ["Rep. Carroceria", "03:30 PM", "04:20 PM"],
-        ["Ingles", "04:20 PM", "05:10 PM"],
+        ["Inglés", "04:20 PM", "05:10 PM"],
         ["Bioética", "05:10 PM", "06:00 PM"],
         ["Bioética", "06:00 PM", "06:50 PM"]
     ],
@@ -65,7 +65,7 @@ const horario = {
 
 
 // ======================================================
-// TAREAS
+// VARIABLES
 // ======================================================
 
 let tareas =
@@ -73,19 +73,26 @@ let tareas =
         localStorage.getItem("ev_tareas")
     ) || [];
 
-let filtroActual = "pendientes";
-
 let siguienteID =
     Number(
         localStorage.getItem("ev_siguiente_id")
     ) || 1;
 
+let filtroActual = "pendientes";
+
+let diaSeleccionado = null;
+
+let reconocimientoActivo = false;
+
+let temporizadorMensaje = null;
+
 
 // ======================================================
-// DÍAS
+// DIAS
 // ======================================================
 
 const nombresDias = [
+
     "domingo",
     "lunes",
     "martes",
@@ -93,11 +100,12 @@ const nombresDias = [
     "jueves",
     "viernes",
     "sabado"
+
 ];
 
 
 // ======================================================
-// GUARDAR
+// GUARDAR DATOS
 // ======================================================
 
 function guardarDatos() {
@@ -116,69 +124,126 @@ function guardarDatos() {
 
 
 // ======================================================
-// FECHA
+// NORMALIZAR TEXTO
+// ======================================================
+
+function normalizarTexto(texto) {
+
+    return String(texto)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .trim();
+
+}
+
+
+// ======================================================
+// ESCAPAR HTML
+// ======================================================
+
+function escaparHTML(texto) {
+
+    return String(texto)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ======================================================
+// FECHA Y SALUDO
 // ======================================================
 
 function actualizarFecha() {
 
     const ahora = new Date();
 
-    let fecha =
-        ahora.toLocaleDateString(
-            "es-MX",
-            {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric"
-            }
-        );
 
-    fecha =
-        fecha.charAt(0).toUpperCase()
-        +
-        fecha.slice(1);
-
-
-    const elemento =
+    const elementoFecha =
         document.getElementById("fecha");
 
-    if (elemento) {
 
-        elemento.textContent =
-            fecha;
+    if (elementoFecha) {
+
+        let texto =
+            ahora.toLocaleDateString(
+                "es-MX",
+                {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+
+        texto =
+            texto.charAt(0).toUpperCase()
+            +
+            texto.slice(1);
+
+
+        elementoFecha.textContent =
+            texto;
 
     }
 
 
     let saludo;
 
-    const hora =
-        ahora.getHours();
 
+    if (ahora.getHours() < 12) {
 
-    if (hora < 12) {
+        saludo =
+            "Buenos días";
 
-        saludo = "Buenos días";
+    } else if (ahora.getHours() < 19) {
 
-    } else if (hora < 19) {
-
-        saludo = "Buenas tardes";
+        saludo =
+            "Buenas tardes";
 
     } else {
 
-        saludo = "Buenas noches";
+        saludo =
+            "Buenas noches";
 
     }
 
 
-    const saludoElemento =
+    const elementoSaludo =
         document.getElementById("saludo");
 
 
-    if (saludoElemento) {
+    if (elementoSaludo) {
 
-        saludoElemento.textContent =
+        elementoSaludo.textContent =
             saludo + ", David";
 
     }
@@ -187,7 +252,7 @@ function actualizarFecha() {
 
 
 // ======================================================
-// DÍA ACTUAL
+// DIA ACTUAL
 // ======================================================
 
 function obtenerDiaActual() {
@@ -203,13 +268,15 @@ function obtenerDiaActual() {
 // CONVERTIR HORA
 // ======================================================
 
-function convertirHora(hora) {
+function convertirHora(horaTexto) {
 
     const partes =
-        hora.trim().split(" ");
+        horaTexto.trim().split(" ");
+
 
     const tiempo =
         partes[0];
+
 
     const periodo =
         partes[1]
@@ -217,7 +284,7 @@ function convertirHora(hora) {
             : "PM";
 
 
-    let [h, m] =
+    let [hora, minutos] =
         tiempo
             .split(":")
             .map(Number);
@@ -226,10 +293,10 @@ function convertirHora(hora) {
     if (
         periodo === "AM"
         &&
-        h === 12
+        hora === 12
     ) {
 
-        h = 0;
+        hora = 0;
 
     }
 
@@ -237,18 +304,18 @@ function convertirHora(hora) {
     if (
         periodo === "PM"
         &&
-        h !== 12
+        hora !== 12
     ) {
 
-        h += 12;
+        hora += 12;
 
     }
 
 
     return (
-        h * 60
+        hora * 60
         +
-        (m || 0)
+        minutos
     );
 
 }
@@ -268,15 +335,13 @@ function obtenerHorarioHoy() {
 
 
 // ======================================================
-// MOSTRAR HORARIO
+// MOSTRAR HORARIO DE HOY
 // ======================================================
 
 function mostrarHorarioHoy() {
 
     const contenedor =
-        document.getElementById(
-            "horarioHoy"
-        );
+        document.getElementById("horarioHoy");
 
 
     if (!contenedor) return;
@@ -286,20 +351,21 @@ function mostrarHorarioHoy() {
         obtenerHorarioHoy();
 
 
-    contenedor.innerHTML =
-        "";
+    contenedor.innerHTML = "";
 
 
-    if (
-        lista.length === 0
-    ) {
+    if (lista.length === 0) {
 
         contenedor.innerHTML = `
+
             <div class="clase">
+
                 <div class="clase-nombre">
                     Sin clase
                 </div>
+
             </div>
+
         `;
 
         return;
@@ -315,20 +381,23 @@ function mostrarHorarioHoy() {
                 <div class="clase">
 
                     <div class="clase-hora">
+
                         ${clase[1]}
+
                     </div>
 
                     <div>
 
                         <div class="clase-nombre">
-                            ${clase[0]}
+
+                            ${escaparHTML(clase[0])}
+
                         </div>
 
                         <div class="clase-horario">
-                            Horario:
-                            ${clase[1]}
-                            —
-                            ${clase[2]}
+
+                            ${clase[1]} — ${clase[2]}
+
                         </div>
 
                     </div>
@@ -357,15 +426,17 @@ function actualizarClase() {
         new Date();
 
 
-    const minutos =
+    const minutosActuales =
         ahora.getHours() * 60
         +
         ahora.getMinutes();
 
 
-    let actual = null;
-    let siguiente = null;
-    let indice = -1;
+    let claseActual = null;
+
+    let siguienteClase = null;
+
+    let indiceActual = -1;
 
 
     for (
@@ -375,32 +446,30 @@ function actualizarClase() {
     ) {
 
         const inicio =
-            convertirHora(
-                lista[i][1]
-            );
+            convertirHora(lista[i][1]);
 
         const fin =
-            convertirHora(
-                lista[i][2]
-            );
+            convertirHora(lista[i][2]);
 
 
         if (
-            minutos >= inicio
+
+            minutosActuales >= inicio
+
             &&
-            minutos < fin
+
+            minutosActuales < fin
+
         ) {
 
-            actual =
+            claseActual =
                 lista[i];
 
-            indice =
+            indiceActual =
                 i;
 
-            siguiente =
-                lista[i + 1]
-                ||
-                null;
+            siguienteClase =
+                lista[i + 1] || null;
 
             break;
 
@@ -408,12 +477,16 @@ function actualizarClase() {
 
 
         if (
-            minutos < inicio
+
+            minutosActuales < inicio
+
             &&
-            siguiente === null
+
+            siguienteClase === null
+
         ) {
 
-            siguiente =
+            siguienteClase =
                 lista[i];
 
         }
@@ -422,78 +495,81 @@ function actualizarClase() {
 
 
     const estado =
-        document.getElementById(
-            "estadoClase"
-        );
+        document.getElementById("estadoClase");
 
     const titulo =
-        document.getElementById(
-            "claseActual"
-        );
+        document.getElementById("claseActual");
 
     const hora =
-        document.getElementById(
-            "horaClase"
-        );
+        document.getElementById("horaClase");
 
-    const siguienteElemento =
-        document.getElementById(
-            "siguienteClase"
-        );
+    const siguiente =
+        document.getElementById("siguienteClase");
 
     const progreso =
-        document.getElementById(
-            "progreso"
-        );
+        document.getElementById("progreso");
 
     const numero =
-        document.getElementById(
-            "numeroClase"
-        );
+        document.getElementById("numeroClase");
 
 
-    if (!estado) return;
+    if (
+        !estado ||
+        !titulo ||
+        !hora ||
+        !siguiente ||
+        !progreso ||
+        !numero
+    ) {
+
+        return;
+
+    }
 
 
-    if (actual) {
+    if (claseActual) {
 
         estado.textContent =
             "CLASE ACTUAL";
 
         titulo.textContent =
-            actual[0];
+            claseActual[0];
 
         hora.textContent =
-            `${actual[1]} — ${actual[2]}`;
+            `${claseActual[1]} — ${claseActual[2]}`;
 
         numero.textContent =
-            String(indice + 1)
-                .padStart(2, "0");
+            String(
+                indiceActual + 1
+            ).padStart(
+                2,
+                "0"
+            );
 
 
-        if (siguiente) {
+        if (siguienteClase) {
 
-            siguienteElemento.textContent =
-                `Después: ${siguiente[0]} · ${siguiente[1]}`;
+            siguiente.textContent =
+                `Después: ${siguienteClase[0]} · ${siguienteClase[1]}`;
 
         } else {
 
-            siguienteElemento.textContent =
+            siguiente.textContent =
                 "Última clase del día";
 
         }
 
 
         const inicio =
-            convertirHora(actual[1]);
+            convertirHora(claseActual[1]);
 
         const fin =
-            convertirHora(actual[2]);
+            convertirHora(claseActual[2]);
 
 
         const porcentaje =
             (
-                (minutos - inicio)
+                (minutosActuales - inicio)
                 /
                 (fin - inicio)
             ) * 100;
@@ -508,8 +584,9 @@ function actualizarClase() {
                 )
             ) + "%";
 
+    }
 
-    } else {
+    else {
 
         estado.textContent =
             "SIN CLASE";
@@ -524,18 +601,22 @@ function actualizarClase() {
             "0%";
 
 
-        if (siguiente) {
+        if (siguienteClase) {
 
-            siguienteElemento.textContent =
-                `Próxima: ${siguiente[0]} · ${siguiente[1]}`;
+            siguiente.textContent =
+                `Próxima: ${siguienteClase[0]} · ${siguienteClase[1]}`;
 
             hora.textContent =
-                siguiente[1];
+                siguienteClase[1];
 
-        } else {
+        }
 
-            siguienteElemento.textContent =
-                "No hay más clases hoy";
+        else {
+
+            siguiente.textContent =
+                lista.length === 0
+                    ? "Hoy no tienes clases"
+                    : "No hay más clases hoy";
 
             hora.textContent =
                 "--";
@@ -548,156 +629,29 @@ function actualizarClase() {
 
 
 // ======================================================
-// TAREAS
-// ======================================================
-
-function renderizarTareas() {
-
-    const inicio =
-        document.getElementById(
-            "tareas"
-        );
-
-    const panel =
-        document.getElementById(
-            "tareasCompletas"
-        );
-
-
-    const pendientes =
-        tareas.filter(
-            tarea =>
-                !tarea.completada
-        );
-
-
-    const completadas =
-        tareas.filter(
-            tarea =>
-                tarea.completada
-        );
-
-
-    const contador =
-        document.getElementById(
-            "contadorTareas"
-        );
-
-
-    if (contador) {
-
-        contador.textContent =
-            pendientes.length;
-
-    }
-
-
-    if (inicio) {
-
-        inicio.innerHTML =
-            "";
-
-
-        if (
-            pendientes.length === 0
-        ) {
-
-            inicio.innerHTML = `
-                <div class="clase">
-                    <div class="clase-nombre">
-                        No tienes tareas pendientes
-                    </div>
-                </div>
-            `;
-
-        } else {
-
-            pendientes
-                .slice()
-                .sort(
-                    ordenarTareas
-                )
-                .slice(0, 5)
-                .forEach(
-                    tarea => {
-
-                        inicio.innerHTML +=
-                            crearHTMLTarea(
-                                tarea
-                            );
-
-                    }
-                );
-
-        }
-
-    }
-
-
-    if (panel) {
-
-        panel.innerHTML =
-            "";
-
-
-        const lista =
-            filtroActual === "pendientes"
-                ? pendientes
-                : completadas;
-
-
-        if (
-            lista.length === 0
-        ) {
-
-            panel.innerHTML = `
-                <div class="clase">
-                    <div class="clase-nombre">
-                        ${
-                            filtroActual === "pendientes"
-                                ? "No tienes tareas pendientes"
-                                : "No hay tareas completadas"
-                        }
-                    </div>
-                </div>
-            `;
-
-        } else {
-
-            lista
-                .slice()
-                .sort(
-                    ordenarTareas
-                )
-                .forEach(
-                    tarea => {
-
-                        panel.innerHTML +=
-                            crearHTMLTarea(
-                                tarea
-                            );
-
-                    }
-                );
-
-        }
-
-    }
-
-}
-
-
-// ======================================================
-// ORDENAR
+// ORDENAR TAREAS
 // ======================================================
 
 function ordenarTareas(a, b) {
 
-    if (!a.fecha && !b.fecha) return 0;
+    if (!a.fecha && !b.fecha) {
 
-    if (!a.fecha) return 1;
+        return 0;
 
-    if (!b.fecha) return -1;
+    }
+
+    if (!a.fecha) {
+
+        return 1;
+
+    }
+
+    if (!b.fecha) {
+
+        return -1;
+
+    }
+
 
     return (
         new Date(a.fecha)
@@ -709,83 +663,107 @@ function ordenarTareas(a, b) {
 
 
 // ======================================================
-// HTML TAREA
+// FORMATEAR FECHA
 // ======================================================
 
-function crearHTMLTarea(tarea) {
+function formatearFecha(fechaTexto) {
 
-    let fechaTexto =
-        "Sin fecha";
+    if (!fechaTexto) {
 
-
-    if (tarea.fecha) {
-
-        const fecha =
-            new Date(
-                tarea.fecha
-            );
-
-
-        fechaTexto =
-            fecha.toLocaleDateString(
-                "es-MX",
-                {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long"
-                }
-            );
-
-
-        fechaTexto +=
-            " · "
-            +
-            fecha.toLocaleTimeString(
-                "es-MX",
-                {
-                    hour: "numeric",
-                    minute: "2-digit"
-                }
-            );
+        return "Sin fecha";
 
     }
 
 
+    const fecha =
+        new Date(fechaTexto);
+
+
+    if (isNaN(fecha.getTime())) {
+
+        return "Sin fecha";
+
+    }
+
+
+    return fecha.toLocaleString(
+        "es-MX",
+        {
+
+            weekday: "long",
+
+            day: "numeric",
+
+            month: "long",
+
+            hour: "numeric",
+
+            minute: "2-digit",
+
+            hour12: true
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// CREAR HTML TAREA
+// ======================================================
+
+function crearHTMLTarea(tarea) {
+
     return `
 
-        <div class="tarea ${
-            tarea.completada
-                ? "tarea-completada"
-                : ""
-        }">
+        <div
+            class="tarea ${
+                tarea.completada
+                    ? "tarea-completada"
+                    : ""
+            }"
+        >
 
             <div class="tarea-top">
 
                 <div>
 
                     <div class="tarea-materia">
+
                         ${escaparHTML(tarea.materia)}
+
                     </div>
+
 
                     <div class="tarea-nombre">
+
                         ${escaparHTML(tarea.nombre)}
+
                     </div>
 
+
                     <div class="tarea-fecha">
-                        ${fechaTexto}
+
+                        ${formatearFecha(tarea.fecha)}
+
                     </div>
 
                 </div>
 
+
                 <button
+                    type="button"
                     class="completar"
                     onclick="cambiarEstadoTarea(${tarea.id})"
+                    title="Completar tarea"
                 >
+
                     ${
                         tarea.completada
                             ? "✓"
                             : "○"
                     }
+
                 </button>
 
             </div>
@@ -798,18 +776,144 @@ function crearHTMLTarea(tarea) {
 
 
 // ======================================================
-// COMPLETAR TAREA
+// RENDERIZAR TAREAS
+// ======================================================
+
+function renderizarTareas() {
+
+    const contenedorInicio =
+        document.getElementById("tareas");
+
+    const contenedorPanel =
+        document.getElementById("tareasCompletas");
+
+    const contador =
+        document.getElementById("contadorTareas");
+
+
+    const pendientes =
+        tareas
+            .filter(
+                tarea =>
+                    !tarea.completada
+            )
+            .sort(ordenarTareas);
+
+
+    const completadas =
+        tareas
+            .filter(
+                tarea =>
+                    tarea.completada
+            )
+            .sort(ordenarTareas);
+
+
+    if (contador) {
+
+        contador.textContent =
+            pendientes.length;
+
+    }
+
+
+    // INICIO
+
+    if (contenedorInicio) {
+
+        if (pendientes.length === 0) {
+
+            contenedorInicio.innerHTML = `
+
+                <div class="clase">
+
+                    <div class="clase-nombre">
+                        No tienes tareas pendientes
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+        else {
+
+            contenedorInicio.innerHTML =
+                pendientes
+                    .slice(0, 5)
+                    .map(crearHTMLTarea)
+                    .join("");
+
+        }
+
+    }
+
+
+    // PANEL
+
+    if (contenedorPanel) {
+
+        const lista =
+            filtroActual === "pendientes"
+                ? pendientes
+                : completadas;
+
+
+        if (lista.length === 0) {
+
+            contenedorPanel.innerHTML = `
+
+                <div class="clase">
+
+                    <div class="clase-nombre">
+
+                        ${
+                            filtroActual === "pendientes"
+                                ? "No tienes tareas pendientes"
+                                : "No hay tareas completadas"
+                        }
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+        else {
+
+            contenedorPanel.innerHTML =
+                lista
+                    .map(crearHTMLTarea)
+                    .join("");
+
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// CAMBIAR ESTADO TAREA
 // ======================================================
 
 function cambiarEstadoTarea(id) {
 
     const tarea =
         tareas.find(
-            t => t.id === id
+            tarea =>
+                tarea.id === Number(id)
         );
 
 
-    if (!tarea) return;
+    if (!tarea) {
+
+        return;
+
+    }
 
 
     tarea.completada =
@@ -823,14 +927,16 @@ function cambiarEstadoTarea(id) {
 
     if (tarea.completada) {
 
-        responderEV(
-            `Listo, David. Marqué ${tarea.nombre} como completada.`
+        mostrarMensajeEV(
+            `Tarea completada: ${tarea.nombre}`
         );
 
-    } else {
+    }
 
-        responderEV(
-            `Volví a poner ${tarea.nombre} como pendiente.`
+    else {
+
+        mostrarMensajeEV(
+            `Tarea pendiente nuevamente: ${tarea.nombre}`
         );
 
     }
@@ -839,535 +945,253 @@ function cambiarEstadoTarea(id) {
 
 
 // ======================================================
-// INTERPRETAR FECHA
+// FILTROS
 // ======================================================
 
-function interpretarFecha(texto) {
+function cambiarFiltroTareas(filtro) {
 
-    if (
-        !texto ||
-        !texto.trim()
-    ) {
+    filtroActual =
+        filtro;
 
-        return null;
+
+    const pendientes =
+        document.getElementById(
+            "filtroPendientes"
+        );
+
+    const completadas =
+        document.getElementById(
+            "filtroCompletadas"
+        );
+
+
+    if (pendientes) {
+
+        pendientes.classList.toggle(
+            "activo",
+            filtro === "pendientes"
+        );
 
     }
 
 
-    const normalizado =
-        normalizarTexto(
-            texto
+    if (completadas) {
+
+        completadas.classList.toggle(
+            "activo",
+            filtro === "completadas"
         );
-
-
-    const ahora =
-        new Date();
-
-
-    // MAÑANA
-
-    if (
-        normalizado.includes(
-            "manana"
-        )
-    ) {
-
-        const fecha =
-            new Date(ahora);
-
-        fecha.setDate(
-            fecha.getDate() + 1
-        );
-
-
-        establecerHoraDesdeTexto(
-            fecha,
-            normalizado
-        );
-
-
-        return fecha;
 
     }
 
 
-    // HOY
+    renderizarTareas();
 
-    if (
-        normalizado.includes(
-            "hoy"
-        )
-    ) {
-
-        const fecha =
-            new Date(ahora);
+}
 
 
-        establecerHoraDesdeTexto(
-            fecha,
-            normalizado
+// ======================================================
+// PANEL HORARIO
+// ======================================================
+
+function mostrarHorario() {
+
+    cerrarTodosLosPaneles();
+
+
+    const panel =
+        document.getElementById(
+            "panelHorario"
         );
 
 
-        return fecha;
+    if (panel) {
+
+        panel.classList.add(
+            "activo"
+        );
 
     }
 
 
-    // DÍAS
-
-    const dias = {
-
-        domingo: 0,
-        lunes: 1,
-        martes: 2,
-        miercoles: 3,
-        jueves: 4,
-        viernes: 5,
-        sabado: 6
-
-    };
+    const diaActual =
+        obtenerDiaActual();
 
 
-    for (
-        const dia in dias
-    ) {
+    diaSeleccionado =
+        horario[diaActual]
+            ? diaActual
+            : "lunes";
 
-        if (
-            normalizado.includes(
-                dia
+
+    cambiarDia(
+        diaSeleccionado
+    );
+
+}
+
+
+// ======================================================
+// CAMBIAR DIA
+// ======================================================
+
+function cambiarDia(dia) {
+
+    diaSeleccionado =
+        dia;
+
+
+    const botones =
+        document.querySelectorAll(
+            ".dias button"
+        );
+
+
+    botones.forEach(
+        boton => {
+
+            boton.classList.toggle(
+                "activo",
+                boton.dataset.dia === dia
+            );
+
+        }
+    );
+
+
+    const contenedor =
+        document.getElementById(
+            "horarioCompleto"
+        );
+
+
+    if (!contenedor) {
+
+        return;
+
+    }
+
+
+    const lista =
+        horario[dia] || [];
+
+
+    if (lista.length === 0) {
+
+        contenedor.innerHTML = `
+
+            <div class="clase">
+
+                <div class="clase-nombre">
+                    Sin clase
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    contenedor.innerHTML =
+        lista
+            .map(
+                (clase, indice) => `
+
+                    <div class="clase">
+
+                        <div class="clase-hora">
+
+                            ${String(indice + 1).padStart(2, "0")}
+
+                        </div>
+
+                        <div>
+
+                            <div class="clase-nombre">
+
+                                ${escaparHTML(clase[0])}
+
+                            </div>
+
+                            <div class="clase-horario">
+
+                                ${clase[1]} — ${clase[2]}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `
             )
-        ) {
-
-            const objetivo =
-                dias[dia];
-
-
-            const actual =
-                ahora.getDay();
-
-
-            let diferencia =
-                objetivo - actual;
-
-
-            if (
-                diferencia <= 0
-            ) {
-
-                diferencia += 7;
-
-            }
-
-
-            const fecha =
-                new Date(ahora);
-
-
-            fecha.setDate(
-                fecha.getDate()
-                +
-                diferencia
-            );
-
-
-            establecerHoraDesdeTexto(
-                fecha,
-                normalizado
-            );
-
-
-            return fecha;
-
-        }
-
-    }
-
-
-    return null;
+            .join("");
 
 }
 
 
 // ======================================================
-// HORA
+// MOSTRAR TAREAS
 // ======================================================
 
-function establecerHoraDesdeTexto(
-    fecha,
-    texto
-) {
+function mostrarTareas() {
 
-    const coincidencia =
-        texto.match(
-            /\b([01]?\d|2[0-3])(?::([0-5]\d))?\s*(am|pm)?\b/i
-        );
+    cerrarTodosLosPaneles();
 
 
-    if (!coincidencia) {
-
-        return;
-
-    }
-
-
-    let hora =
-        Number(
-            coincidencia[1]
-        );
-
-
-    const minutos =
-        coincidencia[2]
-            ? Number(
-                coincidencia[2]
-            )
-            : 0;
-
-
-    const periodo =
-        coincidencia[3]
-            ? coincidencia[3].toLowerCase()
-            : null;
-
-
-    if (
-        periodo === "am"
-    ) {
-
-        if (
-            hora === 12
-        ) {
-
-            hora = 0;
-
-        }
-
-    } else if (
-        periodo === "pm"
-    ) {
-
-        if (
-            hora !== 12
-        ) {
-
-            hora += 12;
-
-        }
-
-    } else {
-
-        // Por defecto PM
-
-        if (
-            hora >= 1 &&
-            hora <= 11
-        ) {
-
-            hora += 12;
-
-        }
-
-    }
-
-
-    fecha.setHours(
-        hora,
-        minutos,
-        0,
-        0
-    );
-
-}
-
-
-// ======================================================
-// NORMALIZAR
-// ======================================================
-
-function normalizarTexto(texto) {
-
-    return texto
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        );
-
-}
-
-
-// ======================================================
-// ESCAPAR HTML
-// ======================================================
-
-function escaparHTML(texto) {
-
-    return String(texto)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-// ======================================================
-// E.V. HABLA
-// ======================================================
-
-let vozActual = null;
-
-
-function hablar(texto) {
-
-    if (
-        !("speechSynthesis" in window)
-    ) {
-
-        return;
-
-    }
-
-
-    window.speechSynthesis.cancel();
-
-
-    const mensaje =
-        new SpeechSynthesisUtterance(
-            texto
-        );
-
-
-    mensaje.lang =
-        "es-MX";
-
-
-    mensaje.rate =
-        1.0;
-
-
-    mensaje.pitch =
-        1.05;
-
-
-    mensaje.volume =
-        1.0;
-
-
-    const voces =
-        window.speechSynthesis
-            .getVoices();
-
-
-    const vozEspañol =
-        voces.find(
-            voz =>
-                voz.lang
-                    .toLowerCase()
-                    .startsWith("es")
-        );
-
-
-    if (vozEspañol) {
-
-        mensaje.voice =
-            vozEspañol;
-
-    }
-
-
-    vozActual =
-        mensaje;
-
-
-    window.speechSynthesis.speak(
-        mensaje
-    );
-
-}
-
-
-// ======================================================
-// RESPONDER
-// ======================================================
-
-function responderEV(
-    mensaje
-) {
-
-    const elemento =
+    const panel =
         document.getElementById(
-            "respuestaEV"
+            "panelTareas"
         );
 
 
-    if (elemento) {
+    if (panel) {
 
-        elemento.textContent =
-            mensaje;
+        panel.classList.add(
+            "activo"
+        );
 
     }
 
 
-    hablar(
-        mensaje
+    cambiarFiltroTareas(
+        filtroActual
     );
 
 }
 
 
 // ======================================================
-// DETENER VOZ
+// CERRAR PANELES
 // ======================================================
 
-function detenerVoz() {
+function cerrarTodosLosPaneles() {
 
-    if (
-        "speechSynthesis" in window
-    ) {
-
-        window.speechSynthesis.cancel();
-
-    }
-
-}
-
-
-// ======================================================
-// ESCUCHAR
-// ======================================================
-
-function escuchar() {
-
-    const Recognition =
-        window.SpeechRecognition
-        ||
-        window.webkitSpeechRecognition;
-
-
-    if (!Recognition) {
-
-        responderEV(
-            "Tu navegador no permite reconocimiento de voz."
-        );
-
-        return;
-
-    }
-
-
-    const reconocimiento =
-        new Recognition();
-
-
-    reconocimiento.lang =
-        "es-MX";
-
-
-    reconocimiento.continuous =
-        false;
-
-
-    reconocimiento.interimResults =
-        false;
-
-
-    reconocimiento.maxAlternatives =
-        1;
-
-
-    responderTexto(
-        "Te escucho..."
-    );
-
-
-    reconocimiento.start();
-
-
-    reconocimiento.onresult =
-        function(evento) {
-
-            const texto =
-                evento
-                    .results[0][0]
-                    .transcript;
-
-
-            responderTexto(
-                "Entendí: " + texto
-            );
-
-
-            procesarComando(
-                texto
-            );
-
-        };
-
-
-    reconocimiento.onerror =
-        function(evento) {
-
-            console.log(
-                evento.error
-            );
-
-
-            responderEV(
-                "No pude escucharte. Inténtalo otra vez."
-            );
-
-        };
-
-
-    reconocimiento.onend =
-        function() {
-
-            const boton =
-                document.getElementById(
-                    "botonEscuchar"
-                );
-
-
-            if (boton) {
-
-                boton.classList.remove(
-                    "escuchando"
-                );
-
-            }
-
-        };
-
-
-    const boton =
+    const panelHorario =
         document.getElementById(
-            "botonEscuchar"
+            "panelHorario"
         );
 
+    const panelTareas =
+        document.getElementById(
+            "panelTareas"
+        );
 
-    if (boton) {
+    if (panelHorario) {
 
-        boton.classList.add(
-            "escuchando"
+        panelHorario.classList.remove(
+            "activo"
+        );
+
+    }
+
+    if (panelTareas) {
+
+        panelTareas.classList.remove(
+            "activo"
         );
 
     }
@@ -1376,230 +1200,180 @@ function escuchar() {
 
 
 // ======================================================
-// TEXTO SIN VOZ
+// CERRAR PANEL
 // ======================================================
 
-function responderTexto(
-    mensaje
+function cerrarPanel() {
+
+    cerrarTodosLosPaneles();
+
+}
+
+
+// ======================================================
+// IR A INICIO
+// ======================================================
+
+function irInicio() {
+
+    cerrarTodosLosPaneles();
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+    actualizarNavegacion(
+        "inicio"
+    );
+
+}
+
+
+// ======================================================
+// CAMBIAR FILTRO DE TAREAS
+// ======================================================
+
+function cambiarFiltroTareas(
+    filtro
 ) {
 
-    const elemento =
+    filtroActual =
+        filtro;
+
+
+    const pendientes =
         document.getElementById(
-            "respuestaEV"
+            "filtroPendientes"
         );
 
-
-    if (elemento) {
-
-        elemento.textContent =
-            mensaje;
-
-    }
-
-}
-
-
-// ======================================================
-// PROCESAR ENTRADA
-// ======================================================
-
-function procesarEntrada() {
-
-    const entrada =
+    const completadas =
         document.getElementById(
-            "entradaTexto"
+            "filtroCompletadas"
         );
 
 
-    if (!entrada) return;
+    if (pendientes) {
+
+        pendientes.classList.toggle(
+            "activo",
+            filtro === "pendientes"
+        );
+
+    }
 
 
-    const texto =
-        entrada.value.trim();
+    if (completadas) {
+
+        completadas.classList.toggle(
+            "activo",
+            filtro === "completadas"
+        );
+
+    }
 
 
-    if (!texto) return;
-
-
-    entrada.value =
-        "";
-
-
-    procesarComando(
-        texto
-    );
+    renderizarTareas();
 
 }
 
 
 // ======================================================
-// COMANDOS
+// NUEVA TAREA
 // ======================================================
 
-function procesarComando(
-    texto
-) {
+function nuevaTarea() {
 
-    const normalizado =
-        normalizarTexto(
-            texto
+    const nombre =
+        prompt(
+            "¿Qué tarea tienes que hacer?"
         );
 
 
-    // TAREAS
-
     if (
-        normalizado.includes("tarea")
-        ||
-        normalizado.includes("entregar")
-        ||
-        normalizado.includes("subir")
+        !nombre ||
+        !nombre.trim()
     ) {
-
-        agregarTareaDesdeTexto(
-            texto
-        );
 
         return;
 
     }
 
-
-    // TAREAS PENDIENTES
-
-    if (
-        normalizado.includes(
-            "que tengo"
-        )
-        &&
-        normalizado.includes(
-            "tarea"
-        )
-    ) {
-
-        hablarDeTareas();
-
-        return;
-
-    }
-
-
-    // HORARIO
-
-    if (
-        normalizado.includes(
-            "horario de hoy"
-        )
-        ||
-        normalizado.includes(
-            "que tengo hoy"
-        )
-    ) {
-
-        hablarHorarioHoy();
-
-        return;
-
-    }
-
-
-    if (
-        normalizado.includes(
-            "que tengo manana"
-        )
-    ) {
-
-        hablarHorarioManana();
-
-        return;
-
-    }
-
-
-    responderEV(
-        "No entendí esa orden. Puedes preguntarme por tus tareas o tu horario."
-    );
-
-}
-
-
-// ======================================================
-// AGREGAR TAREA DESDE VOZ/TEXTO
-// ======================================================
-
-function agregarTareaDesdeTexto(
-    texto
-) {
 
     const materia =
-        detectarMateria(
-            texto
+        prompt(
+            "¿De qué materia es?"
         );
 
 
-    if (!materia) {
-
-        responderEV(
-            "No pude identificar la materia."
-        );
+    if (
+        !materia ||
+        !materia.trim()
+    ) {
 
         return;
 
     }
 
 
-    let nombre =
-        detectarNombreTarea(
-            texto
+    const fechaTexto =
+        prompt(
+            "¿Cuándo se entrega? Ejemplo: mañana a las 6, viernes a las 7"
         );
 
 
-    if (!nombre) {
+    let fecha =
+        null;
 
-        responderEV(
-            "Entendí la materia, pero no qué tienes que entregar."
-        );
 
-        return;
+    if (
+        fechaTexto &&
+        fechaTexto.trim()
+    ) {
+
+        fecha =
+            interpretarFecha(
+                fechaTexto
+            );
 
     }
 
 
-    const fecha =
-        interpretarFecha(
-            texto
-        );
+    const nueva =
+        {
+
+            id:
+                siguienteID++,
+
+            nombre:
+                nombre.trim(),
+
+            materia:
+                materia.trim(),
+
+            fecha:
+                fecha
+                    ? fecha.toISOString()
+                    : null,
+
+            completada:
+                false,
+
+            recordatorio15:
+                false,
+
+            recordatorioDia:
+                false,
+
+            recordatorioVencida:
+                false
+
+        };
 
 
-    tareas.push({
-
-        id:
-            siguienteID++,
-
-        materia:
-            materia,
-
-        nombre:
-            nombre,
-
-        fecha:
-            fecha
-                ? fecha.toISOString()
-                : null,
-
-        completada:
-            false,
-
-        recordatorio15:
-            false,
-
-        recordatorioDia:
-            false,
-
-        recordatorioVencida:
-            false
-
-    });
+    tareas.push(
+        nueva
+    );
 
 
     guardarDatos();
@@ -1607,303 +1381,187 @@ function agregarTareaDesdeTexto(
     renderizarTareas();
 
 
-    if (fecha) {
-
-        responderEV(
-            `Listo, David. Guardé ${nombre} de ${materia}. Se entrega ${formatearFechaCompleta(fecha)}.`
-        );
-
-    } else {
-
-        responderEV(
-            `Listo, David. Guardé ${nombre} de ${materia}, pero no tiene fecha de entrega.`
-        );
-
-    }
-
-}
-
-
-// ======================================================
-// DETECTAR MATERIA
-// ======================================================
-
-function detectarMateria(
-    texto
-) {
-
-    const materias = [
-
-        ["matematicas", "Matemáticas"],
-        ["quimica", "Química"],
-        ["fisica", "Física"],
-        ["ingles", "Inglés"],
-        ["bioetica", "Bioética"],
-        ["artes", "Artes"],
-        ["autotronica", "Autotrónica"],
-        ["rep motores gasolina", "Rep. Motores gasolina"],
-        ["rep. motores gasolina", "Rep. Motores gasolina"],
-        ["rep carroceria", "Rep. Carroceria"],
-        ["rep. carroceria", "Rep. Carroceria"]
-
-    ];
-
-
-    const normalizado =
-        normalizarTexto(
-            texto
-        );
-
-
-    for (
-        const [busqueda, nombre]
-        of materias
-    ) {
-
-        if (
-            normalizado.includes(
-                busqueda
-            )
-        ) {
-
-            return nombre;
-
-        }
-
-    }
-
-
-    return null;
-
-}
-
-
-// ======================================================
-// NOMBRE DE TAREA
-// ======================================================
-
-function detectarNombreTarea(
-    texto
-) {
-
-    let resultado =
-        texto;
-
-
-    resultado =
-        resultado.replace(
-            /agrega(?:r)?\s+(una\s+)?tarea/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado.replace(
-            /tengo\s+(que)?/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado.replace(
-            /de\s+(matemáticas|matematicas|química|quimica|física|fisica|inglés|ingles|bioética|bioetica|artes|autotrónica|autotronica)/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado.replace(
-            /\b(mañana|manana|hoy|lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado)\b/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado.replace(
-            /\ba\s+(las?|la)\s+\d{1,2}(?::\d{2})?\s*(am|pm)?/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado.replace(
-            /\bpara\b/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado.replace(
-            /\b(subir|entregar)\b/gi,
-            ""
-        );
-
-
-    resultado =
-        resultado
-            .replace(
-                /\s+/g,
-                " "
-            )
-            .trim();
-
-
-    return resultado.length >= 2
-        ? resultado
-        : null;
-
-}
-
-
-// ======================================================
-// HABLAR DE TAREAS
-// ======================================================
-
-function hablarDeTareas() {
-
-    const pendientes =
-        tareas.filter(
-            t =>
-                !t.completada
-        );
-
-
-    if (
-        pendientes.length === 0
-    ) {
-
-        responderEV(
-            "No tienes tareas pendientes, David."
-        );
-
-        return;
-
-    }
-
-
-    const tarea =
-        pendientes
-            .slice()
-            .sort(
-                ordenarTareas
-            )[0];
-
-
-    let respuesta =
-        `Tienes ${pendientes.length} tarea${pendientes.length === 1 ? "" : "s"} pendiente${pendientes.length === 1 ? "" : "s"}. `;
-
-
-    respuesta +=
-        `La más próxima es ${tarea.nombre} de ${tarea.materia}`;
-
-
-    if (tarea.fecha) {
-
-        respuesta +=
-            `, para ${formatearFechaCompleta(new Date(tarea.fecha))}`;
-
-    }
-
-
     responderEV(
-        respuesta
+        fecha
+            ? `Listo. Agregué ${nueva.nombre} de ${nueva.materia} para ${formatearFechaCompleta(fecha)}.`
+            : `Listo. Agregué ${nueva.nombre} de ${nueva.materia}.`
     );
 
 }
 
 
 // ======================================================
-// HORARIO HOY
+// MOSTRAR HORARIO COMPLETO
 // ======================================================
 
-function hablarHorarioHoy() {
+function mostrarHorario() {
+
+    cerrarTodosLosPaneles();
+
+
+    const panel =
+        document.getElementById(
+            "panelHorario"
+        );
+
+
+    if (panel) {
+
+        panel.classList.add(
+            "activo"
+        );
+
+    }
+
+
+    const diaActual =
+        new Date().getDay();
+
+
+    const indice =
+        diaActual === 0
+            ? 0
+            : diaActual - 1;
+
+
+    cambiarDia(
+        indice
+    );
+
+}
+
+
+// ======================================================
+// CAMBIAR DÍA
+// ======================================================
+
+function cambiarDia(
+    indice
+) {
+
+    const dias =
+        [
+            "lunes",
+            "martes",
+            "miercoles",
+            "jueves",
+            "viernes"
+        ];
+
+
+    const nombreDia =
+        dias[indice];
+
 
     const lista =
-        obtenerHorarioHoy();
+        horario[nombreDia]
+        || [];
+
+
+    const contenedor =
+        document.getElementById(
+            "horarioCompleto"
+        );
+
+
+    if (!contenedor) return;
+
+
+    contenedor.innerHTML =
+        "";
+
+
+    document
+        .querySelectorAll(
+            ".dias button"
+        )
+        .forEach(
+            boton =>
+                boton.classList.remove(
+                    "activo"
+                )
+        );
+
+
+    const botones =
+        document.querySelectorAll(
+            ".dias button"
+        );
+
+
+    if (
+        botones[indice]
+    ) {
+
+        botones[indice].classList.add(
+            "activo"
+        );
+
+    }
 
 
     if (
         lista.length === 0
     ) {
 
-        responderEV(
-            "Hoy no tienes clases."
-        );
+        contenedor.innerHTML = `
+
+            <div class="clase">
+
+                <div class="clase-nombre">
+                    Sin clase
+                </div>
+
+            </div>
+
+        `;
 
         return;
 
     }
 
 
-    responderEV(
-        `Hoy tienes ${lista.length} clases. Tu primera clase es ${lista[0][0]} a la ${lista[0][1]}.`
-    );
-
-}
-
-
-// ======================================================
-// HORARIO MAÑANA
-// ======================================================
-
-function hablarHorarioManana() {
-
-    const ahora =
-        new Date();
-
-
-    const dia =
+    lista.forEach(
         (
-            ahora.getDay()
-            +
-            1
-        ) % 7;
+            clase,
+            numero
+        ) => {
 
+            contenedor.innerHTML += `
 
-    const nombre =
-        nombresDias[dia];
+                <div class="clase">
 
+                    <div class="clase-hora">
 
-    const lista =
-        horario[nombre] || [];
+                        ${String(numero + 1)
+                            .padStart(2, "0")}
 
+                    </div>
 
-    if (
-        lista.length === 0
-    ) {
+                    <div>
 
-        responderEV(
-            "Mañana no tienes clases."
-        );
+                        <div class="clase-nombre">
 
-        return;
+                            ${escaparHTML(
+                                clase[0]
+                            )}
 
-    }
+                        </div>
 
+                        <div class="clase-horario">
 
-    responderEV(
-        `Mañana tienes ${lista.length} clases. Tu primera clase es ${lista[0][0]} a la ${lista[0][1]}.`
-    );
+                            ${clase[1]}
+                            —
+                            ${clase[2]}
 
-}
+                        </div>
 
+                    </div>
 
-// ======================================================
-// FECHA FORMATEADA
-// ======================================================
+                </div>
 
-function formatearFechaCompleta(
-    fecha
-) {
+            `;
 
-    return fecha.toLocaleString(
-        "es-MX",
-        {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            hour: "numeric",
-            minute: "2-digit"
         }
     );
 
@@ -1911,13 +1569,213 @@ function formatearFechaCompleta(
 
 
 // ======================================================
-// RECORDATORIOS
+// ACTIVAR E.V.
+// ======================================================
+
+function activarEV() {
+
+    cerrarTodosLosPaneles();
+
+    actualizarNavegacion(
+        "ev"
+    );
+
+
+    const entrada =
+        document.getElementById(
+            "entradaTexto"
+        );
+
+
+    if (entrada) {
+
+        entrada.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+
+        setTimeout(
+            () => {
+
+                entrada.focus();
+
+            },
+            500
+        );
+
+    }
+
+
+    responderTexto(
+        "Estoy lista. Puedes escribirme o hablarme."
+    );
+
+}
+
+
+// ======================================================
+// ACTUALIZAR NAVEGACIÓN
+// ======================================================
+
+function actualizarNavegacion(
+    seccion
+) {
+
+    const botones =
+        document.querySelectorAll(
+            ".nav button"
+        );
+
+
+    botones.forEach(
+        boton =>
+            boton.classList.remove(
+                "nav-activo"
+            )
+    );
+
+
+    if (
+        seccion === "inicio"
+        &&
+        botones[0]
+    ) {
+
+        botones[0].classList.add(
+            "nav-activo"
+        );
+
+    }
+
+
+    if (
+        seccion === "horario"
+        &&
+        botones[1]
+    ) {
+
+        botones[1].classList.add(
+            "nav-activo"
+        );
+
+    }
+
+
+    if (
+        seccion === "tareas"
+        &&
+        botones[2]
+    ) {
+
+        botones[2].classList.add(
+            "nav-activo"
+        );
+
+    }
+
+
+    if (
+        seccion === "ev"
+        &&
+        botones[3]
+    ) {
+
+        botones[3].classList.add(
+            "nav-activo"
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// NOTIFICACIONES
+// ======================================================
+
+function solicitarNotificaciones() {
+
+    if (
+        !("Notification" in window)
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        Notification.permission === "default"
+    ) {
+
+        Notification.requestPermission()
+            .catch(
+                () => {}
+            );
+
+    }
+
+}
+
+
+function notificar(
+    titulo,
+    mensaje
+) {
+
+    if (
+        !("Notification" in window)
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        Notification.permission !== "granted"
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        new Notification(
+            titulo,
+            {
+                body: mensaje,
+                icon: ""
+            }
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Error en notificación:",
+            error
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// REVISAR RECORDATORIOS
 // ======================================================
 
 function revisarRecordatorios() {
 
     const ahora =
         new Date();
+
+
+    let huboCambios =
+        false;
 
 
     tareas.forEach(
@@ -1950,6 +1808,8 @@ function revisarRecordatorios() {
                 diferencia / 60000;
 
 
+            // TAREA VENCIDA
+
             if (
                 diferencia < 0
                 &&
@@ -1959,10 +1819,8 @@ function revisarRecordatorios() {
                 tarea.recordatorioVencida =
                     true;
 
-
-                responderEV(
-                    `La tarea ${tarea.nombre} ya venció.`
-                );
+                huboCambios =
+                    true;
 
 
                 notificar(
@@ -1970,15 +1828,12 @@ function revisarRecordatorios() {
                     `${tarea.nombre} de ${tarea.materia} ya venció.`
                 );
 
-
-                guardarDatos();
-
-                return;
-
             }
 
 
-            if (
+            // MENOS DE 15 MINUTOS
+
+            else if (
                 minutos > 0
                 &&
                 minutos <= 15
@@ -1989,10 +1844,8 @@ function revisarRecordatorios() {
                 tarea.recordatorio15 =
                     true;
 
-
-                responderEV(
-                    `David, faltan menos de 15 minutos para entregar ${tarea.nombre}.`
-                );
+                huboCambios =
+                    true;
 
 
                 notificar(
@@ -2000,53 +1853,40 @@ function revisarRecordatorios() {
                     `${tarea.nombre} vence en menos de 15 minutos.`
                 );
 
+            }
 
-                guardarDatos();
+
+            // RECORDATORIO EL MISMO DÍA
+
+            else if (
+                minutos > 15
+                &&
+                minutos <= 1440
+                &&
+                !tarea.recordatorioDia
+            ) {
+
+                tarea.recordatorioDia =
+                    true;
+
+                huboCambios =
+                    true;
+
+
+                notificar(
+                    "Tarea para hoy",
+                    `${tarea.nombre} de ${tarea.materia} se entrega hoy.`
+                );
 
             }
 
         }
     );
 
-}
 
+    if (huboCambios) {
 
-// ======================================================
-// NOTIFICACIONES
-// ======================================================
-
-function solicitarNotificaciones() {
-
-    if (
-        "Notification" in window
-        &&
-        Notification.permission === "default"
-    ) {
-
-        Notification.requestPermission();
-
-    }
-
-}
-
-
-function notificar(
-    titulo,
-    mensaje
-) {
-
-    if (
-        "Notification" in window
-        &&
-        Notification.permission === "granted"
-    ) {
-
-        new Notification(
-            titulo,
-            {
-                body: mensaje
-            }
-        );
+        guardarDatos();
 
     }
 
@@ -2054,7 +1894,7 @@ function notificar(
 
 
 // ======================================================
-// INICIAR
+// INICIAR E.V.
 // ======================================================
 
 function iniciarEV() {
@@ -2067,13 +1907,11 @@ function iniciarEV() {
 
     renderizarTareas();
 
-    solicitarNotificaciones();
 
-    revisarRecordatorios();
-
+    // Actualizar cada minuto
 
     setInterval(
-        () => {
+        function() {
 
             actualizarFecha();
 
@@ -2082,14 +1920,43 @@ function iniciarEV() {
             revisarRecordatorios();
 
         },
-        10000
+        60000
+    );
+
+
+    // Revisar inmediatamente
+
+    revisarRecordatorios();
+
+
+    // Actualizar al volver a la aplicación
+
+    document.addEventListener(
+        "visibilitychange",
+        function() {
+
+            if (
+                !document.hidden
+            ) {
+
+                actualizarFecha();
+
+                actualizarClase();
+
+                renderizarTareas();
+
+                revisarRecordatorios();
+
+            }
+
+        }
     );
 
 }
 
 
 // ======================================================
-// ENTER
+// EVENTOS DE TECLADO
 // ======================================================
 
 document.addEventListener(
@@ -2112,6 +1979,8 @@ document.addEventListener(
                         evento.key === "Enter"
                     ) {
 
+                        evento.preventDefault();
+
                         procesarEntrada();
 
                     }
@@ -2131,6 +2000,7 @@ document.addEventListener(
             window.speechSynthesis
                 .getVoices();
 
+
             window.speechSynthesis
                 .onvoiceschanged =
                 function() {
@@ -2144,6 +2014,78 @@ document.addEventListener(
 
 
         iniciarEV();
+
+    }
+);
+
+
+// ======================================================
+// CLIC EN NAVEGACIÓN
+// ======================================================
+
+document.addEventListener(
+    "click",
+    function(evento) {
+
+        const boton =
+            evento.target.closest(
+                ".nav button"
+            );
+
+
+        if (!boton) return;
+
+
+        const texto =
+            boton.textContent
+                .trim()
+                .toLowerCase();
+
+
+        if (
+            texto === "inicio"
+        ) {
+
+            actualizarNavegacion(
+                "inicio"
+            );
+
+        }
+
+
+        if (
+            texto === "horario"
+        ) {
+
+            actualizarNavegacion(
+                "horario"
+            );
+
+        }
+
+
+        if (
+            texto === "tareas"
+        ) {
+
+            actualizarNavegacion(
+                "tareas"
+            );
+
+        }
+
+
+        if (
+            texto === "e.v."
+            ||
+            texto === "ev"
+        ) {
+
+            actualizarNavegacion(
+                "ev"
+            );
+
+        }
 
     }
 );
