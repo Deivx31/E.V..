@@ -15,17 +15,7 @@
         content="#08090d"
     >
 
-    <meta
-        name="mobile-web-app-capable"
-        content="yes"
-    >
-
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes"
-    >
-
-    <title>E.V.</title>
+    <title>E.V. - Asistente escolar</title>
 
     <link
         rel="stylesheet"
@@ -39,14 +29,23 @@
 
 <main class="app">
 
-    <!-- =================================
+    <!-- ==============================
          ENCABEZADO
-    ================================== -->
+    =============================== -->
 
     <header class="header">
 
-        <div class="logo">
-            E.V.
+        <div class="logo-area">
+
+            <div class="logo">
+                E.V.
+            </div>
+
+            <div class="estado-online">
+                <span></span>
+                En línea
+            </div>
+
         </div>
 
         <div
@@ -66,11 +65,13 @@
     </header>
 
 
-    <!-- =================================
+    <!-- ==============================
          CLASE ACTUAL
-    ================================== -->
+    =============================== -->
 
     <section class="card principal">
+
+        <div class="principal-glow"></div>
 
         <div
             id="estadoClase"
@@ -82,9 +83,7 @@
         <div class="clase-numero">
 
             Clase
-            <span id="numeroClase">
-                --
-            </span>
+            <span id="numeroClase">--</span>
 
         </div>
 
@@ -118,9 +117,9 @@
     </section>
 
 
-    <!-- =================================
+    <!-- ==============================
          HORARIO DE HOY
-    ================================== -->
+    =============================== -->
 
     <section class="seccion">
 
@@ -131,7 +130,7 @@
             </h2>
 
             <button
-                class="boton-secundario"
+                type="button"
                 onclick="mostrarHorario()"
             >
                 Ver todo
@@ -147,9 +146,9 @@
     </section>
 
 
-    <!-- =================================
+    <!-- ==============================
          TAREAS
-    ================================== -->
+    =============================== -->
 
     <section class="seccion">
 
@@ -174,6 +173,7 @@
         ></div>
 
         <button
+            type="button"
             class="boton-agregar"
             onclick="nuevaTarea()"
         >
@@ -183,27 +183,54 @@
     </section>
 
 
-    <!-- =================================
+    <!-- ==============================
          ASISTENTE E.V.
-    ================================== -->
+    =============================== -->
 
-    <section class="seccion asistente">
+    <section
+        id="seccionEV"
+        class="seccion asistente"
+    >
 
         <div class="titulo-seccion">
 
             <h2>
-                E.V.
+                Habla con E.V.
             </h2>
+
+            <span class="ev-status">
+                Asistente activa
+            </span>
 
         </div>
 
+
         <div class="asistente-box">
+
+            <div class="ev-visual">
+
+                <div
+                    id="orbitaEV"
+                    class="orbita-ev"
+                >
+
+                    <div class="orbita-anillo"></div>
+                    <div class="orbita-anillo anillo-2"></div>
+
+                    <div class="ev-nucleo">
+                        E.V.
+                    </div>
+
+                </div>
+
+            </div>
+
 
             <div
                 id="respuestaEV"
                 class="respuesta-ev"
             >
-                Hola David. ¿Qué necesitas?
+                Hola David. Soy E.V. ¿Qué necesitas?
             </div>
 
 
@@ -212,86 +239,104 @@
                 <input
                     id="entradaTexto"
                     type="text"
-                    placeholder="Escribe algo..."
+                    placeholder="Escribe o habla con E.V..."
                     autocomplete="off"
-                    enterkeyhint="send"
                 >
 
                 <button
-                    onclick="procesarEntrada()"
+                    type="button"
+                    id="botonEnviar"
                     class="boton-enviar"
+                    onclick="procesarEntrada()"
+                    title="Enviar"
                 >
                     Enviar
-                </button>
-
-                <button
-                    id="botonEscuchar"
-                    class="microfono"
-                    onclick="escuchar()"
-                    title="Hablar con E.V."
-                    aria-label="Hablar con E.V."
-                >
-                    Mic
                 </button>
 
             </div>
 
 
-            <button
-                class="detener-voz"
-                onclick="detenerVoz()"
-            >
-                Detener voz
-            </button>
+            <div class="controles-voz">
+
+                <button
+                    type="button"
+                    id="botonEscuchar"
+                    class="boton-voz"
+                    onclick="escuchar()"
+                    title="Hablar con E.V."
+                >
+
+                    <span class="ondas onda-1"></span>
+                    <span class="ondas onda-2"></span>
+                    <span class="ondas onda-3"></span>
+
+                    <span class="icono-mic">
+                        Mic
+                    </span>
+
+                </button>
+
+                <div
+                    id="estadoVoz"
+                    class="estado-voz"
+                >
+                    Toca para hablar
+                </div>
+
+            </div>
 
         </div>
 
     </section>
 
-
-    <!-- =================================
-         NAVEGACIÓN
-    ================================== -->
-
-    <nav class="nav">
-
-        <button
-            onclick="irInicio()"
-            class="nav-activo"
-            id="navInicio"
-        >
-            Inicio
-        </button>
-
-        <button
-            onclick="mostrarHorario()"
-            id="navHorario"
-        >
-            Horario
-        </button>
-
-        <button
-            onclick="mostrarTareas()"
-            id="navTareas"
-        >
-            Tareas
-        </button>
-
-        <button
-            onclick="activarEV()"
-            id="navEV"
-        >
-            E.V.
-        </button>
-
-    </nav>
-
 </main>
 
 
-<!-- =====================================
-     PANEL DEL HORARIO
-====================================== -->
+<!-- ==============================
+     NAVEGACIÓN
+=============================== -->
+
+<nav class="nav">
+
+    <button
+        type="button"
+        id="navInicio"
+        onclick="irInicio()"
+        class="nav-activo"
+    >
+        Inicio
+    </button>
+
+    <button
+        type="button"
+        id="navHorario"
+        onclick="mostrarHorario()"
+    >
+        Horario
+    </button>
+
+    <button
+        type="button"
+        id="navTareas"
+        onclick="mostrarTareas()"
+    >
+        Tareas
+    </button>
+
+    <button
+        type="button"
+        id="navEV"
+        onclick="activarEV()"
+    >
+        E.V.
+    </button>
+
+</nav>
+
+
+<!-- ==============================
+     PANEL HORARIO
+=============================== -->
 
 <div
     id="panelHorario"
@@ -305,7 +350,7 @@
             <div>
 
                 <div class="panel-subtitulo">
-                    E.V.
+                    ORGANIZACIÓN
                 </div>
 
                 <h2>
@@ -315,7 +360,7 @@
             </div>
 
             <button
-                class="cerrar"
+                type="button"
                 onclick="cerrarPanel()"
             >
                 Cerrar
@@ -324,41 +369,44 @@
         </div>
 
 
-        <!-- DÍAS -->
-
         <div class="dias">
 
             <button
-                onclick="cambiarDia(0)"
-                id="dia0"
+                type="button"
+                data-dia="lunes"
+                onclick="cambiarDia('lunes')"
             >
                 Lunes
             </button>
 
             <button
-                onclick="cambiarDia(1)"
-                id="dia1"
+                type="button"
+                data-dia="martes"
+                onclick="cambiarDia('martes')"
             >
                 Martes
             </button>
 
             <button
-                onclick="cambiarDia(2)"
-                id="dia2"
+                type="button"
+                data-dia="miercoles"
+                onclick="cambiarDia('miercoles')"
             >
                 Miércoles
             </button>
 
             <button
-                onclick="cambiarDia(3)"
-                id="dia3"
+                type="button"
+                data-dia="jueves"
+                onclick="cambiarDia('jueves')"
             >
                 Jueves
             </button>
 
             <button
-                onclick="cambiarDia(4)"
-                id="dia4"
+                type="button"
+                data-dia="viernes"
+                onclick="cambiarDia('viernes')"
             >
                 Viernes
             </button>
@@ -376,9 +424,9 @@
 </div>
 
 
-<!-- =====================================
-     PANEL DE TAREAS
-====================================== -->
+<!-- ==============================
+     PANEL TAREAS
+=============================== -->
 
 <div
     id="panelTareas"
@@ -392,7 +440,7 @@
             <div>
 
                 <div class="panel-subtitulo">
-                    E.V.
+                    ORGANIZACIÓN
                 </div>
 
                 <h2>
@@ -402,7 +450,7 @@
             </div>
 
             <button
-                class="cerrar"
+                type="button"
                 onclick="cerrarPanel()"
             >
                 Cerrar
@@ -411,11 +459,10 @@
         </div>
 
 
-        <!-- FILTROS -->
-
         <div class="filtro-tareas">
 
             <button
+                type="button"
                 id="filtroPendientes"
                 class="filtro activo"
                 onclick="cambiarFiltroTareas('pendientes')"
@@ -424,6 +471,7 @@
             </button>
 
             <button
+                type="button"
                 id="filtroCompletadas"
                 class="filtro"
                 onclick="cambiarFiltroTareas('completadas')"
@@ -441,6 +489,7 @@
 
 
         <button
+            type="button"
             class="boton-agregar"
             onclick="nuevaTarea()"
         >
@@ -452,34 +501,36 @@
 </div>
 
 
-<!-- =====================================
-     PANEL PARA AGREGAR TAREA
-====================================== -->
+<!-- ==============================
+     MODAL NUEVA TAREA
+=============================== -->
 
 <div
-    id="panelNuevaTarea"
-    class="panel"
+    id="modalTarea"
+    class="modal"
 >
 
-    <div class="panel-contenido">
+    <div class="modal-fondo"></div>
 
-        <div class="panel-header">
+    <div class="modal-contenido">
+
+        <div class="modal-header">
 
             <div>
 
                 <div class="panel-subtitulo">
-                    E.V.
+                    NUEVA ACTIVIDAD
                 </div>
 
                 <h2>
-                    Nueva tarea
+                    Agregar tarea
                 </h2>
 
             </div>
 
             <button
-                class="cerrar"
-                onclick="cerrarPanelTarea()"
+                type="button"
+                onclick="cerrarModalTarea()"
             >
                 Cerrar
             </button>
@@ -487,96 +538,71 @@
         </div>
 
 
-        <div class="formulario-tarea">
+        <label>
+            Materia
+        </label>
 
-            <label for="nuevaMateria">
-                Materia
-            </label>
-
-            <select id="nuevaMateria">
-
-                <option value="">
-                    Selecciona una materia
-                </option>
-
-                <option value="Matemáticas">
-                    Matemáticas
-                </option>
-
-                <option value="Química">
-                    Química
-                </option>
-
-                <option value="Física">
-                    Física
-                </option>
-
-                <option value="Inglés">
-                    Inglés
-                </option>
-
-                <option value="Bioética">
-                    Bioética
-                </option>
-
-                <option value="Artes">
-                    Artes
-                </option>
-
-                <option value="Autotrónica">
-                    Autotrónica
-                </option>
-
-                <option value="Rep. Motores gasolina">
-                    Rep. Motores gasolina
-                </option>
-
-                <option value="Rep. Carroceria">
-                    Rep. Carroceria
-                </option>
-
-            </select>
+        <input
+            id="inputMateria"
+            type="text"
+            placeholder="Ejemplo: Matemáticas"
+        >
 
 
-            <label for="nuevaTarea">
-                Tarea
-            </label>
+        <label>
+            Tarea
+        </label>
 
-            <input
-                id="nuevaTarea"
-                type="text"
-                placeholder="¿Qué tienes que hacer?"
-                autocomplete="off"
-            >
-
-
-            <label for="nuevaFecha">
-                Fecha de entrega
-            </label>
-
-            <input
-                id="nuevaFecha"
-                type="datetime-local"
-            >
+        <input
+            id="inputNombreTarea"
+            type="text"
+            placeholder="¿Qué tienes que hacer?"
+        >
 
 
-            <button
-                class="boton-agregar"
-                onclick="guardarNuevaTarea()"
-            >
-                Guardar tarea
-            </button>
+        <label>
+            Fecha y hora
+        </label>
 
-        </div>
+        <input
+            id="inputFechaTarea"
+            type="datetime-local"
+        >
+
+
+        <button
+            type="button"
+            class="boton-guardar"
+            onclick="guardarNuevaTarea()"
+        >
+            Guardar tarea
+        </button>
 
     </div>
 
 </div>
 
 
-<!-- =====================================
-     SCRIPT
-====================================== -->
+<!-- ==============================
+     MENSAJE FLOTANTE
+=============================== -->
+
+<div
+    id="evMensaje"
+    class="ev-mensaje"
+>
+
+    <div class="ev-circulo">
+        E.V.
+    </div>
+
+    <div
+        id="evMensajeTexto"
+        class="ev-texto"
+    ></div>
+
+</div>
+
 
 <script src="app.js"></script>
 
